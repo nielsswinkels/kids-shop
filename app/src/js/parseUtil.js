@@ -9,6 +9,12 @@ export async function getProductByBarcode (barcode) {
   return await query.first();
 }
 
+export async function getPaymentcardByBarcode (barcode) {
+  const query = new parse.Query('paymentcard');
+  query.equalTo('barcode', barcode);
+  return await query.first();
+}
+
 // import Store from 'src/store'
 // import { Store } from 'src/store/index'
 
@@ -809,5 +815,6 @@ export default {
   // getTeamMembershipForUser,
   // getTeamMembers,
   // getTotalKillCountForTeam
-  getProductByBarcode
+  getProductByBarcode,
+  getPaymentcardByBarcode
 }
