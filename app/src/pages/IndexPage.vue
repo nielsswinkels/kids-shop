@@ -10,7 +10,7 @@
     <q-list bordered class="q-mt-md">
       <q-item v-for="(item, index) in scannedItems" :key="index">
         <q-item-section avatar>
-          <q-img :src="item.image || placeholderImage" :alt="item.name" style="width: 50px; height: 50px;" />
+          <q-img :src="item.image?.url() || placeholderImage" :alt="item.name" style="width: 50px; height: 50px;" />
         </q-item-section>
         <q-item-section>
           <q-item-label>{{ item.name }}</q-item-label>
@@ -41,6 +41,9 @@
 </template>
 
 <script>
+
+import parseUtil from 'src/js/parseUtil';
+
 export default {
   data() {
     return {
@@ -64,9 +67,8 @@ export default {
       });
     },
     async fetchItem(barcode) {
-      const query = new Parse.Query('Items');
-      query.equalTo('barcode', barcode);
-      const result = await query.first();
+      console.log('Going to fetch barcode', barcode)
+      const result = await parseUtil.getProductByBarcode(barcode)
       if (result) {
         const item = {
           name: result.get('name'),
