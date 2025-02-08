@@ -10,7 +10,7 @@
     <q-list bordered class="q-mt-md" v-if="!this.showReceipt">
       <q-item v-for="(item, index) in scannedItems" :key="index">
         <q-item-section avatar>
-          <q-img :src="item.image?.url() || placeholderImage" :alt="item.name" style="width: 50px; height: 50px;" />
+          <q-img :src="item.image?.url() || placeholderImage" :alt="item.name" style="width: 100px; height: 100px;" />
         </q-item-section>
         <q-item-section>
           <q-item-label>{{ item.name }}</q-item-label>
@@ -26,8 +26,11 @@
     <div class="q-mt-md" v-if="!this.showReceipt">
         <q-item-label class="text-h4">Total: {{ totalAmount }} SEK</q-item-label>
       </div>
-    <div class="q-mt-md" v-if="!this.showReceipt">
-      <q-btn color="primary" @click="checkout">Betala</q-btn>
+    <div class="q-mt-md row justify-between" v-if="!this.showReceipt">
+      <div class="q-mt-md col row justify-begin">
+        <q-btn color="primary" @click="checkout">Betala</q-btn> 
+      <q-img src="QR-BETALA.png" style="width: 100px; height: 100px;" />
+      </div>
     </div>
     <div v-if="showReceipt" class="q-mt-md">
       <q-list bordered>
@@ -50,8 +53,15 @@
           </q-item-section>
         </q-item>
       </q-list>
-      <div class="q-mt-md">
-        <q-btn color="primary" @click="reset">Nästa</q-btn>
+      <div class="q-mt-md row justify-between">
+        <div class="q-mt-md col row justify-begin">
+          <q-btn  @click="backToShopping">Förregående</q-btn>
+          <q-img src="QR-FÖRREGÅENDE.png" style="width: 100px; height: 100px;" />
+        </div>
+        <div class="q-mt-md col row justify-end">
+          <q-btn color="primary" @click="reset">Nästa</q-btn>
+          <q-img src="QR-NASTA.png" style="width: 100px; height: 100px;" />
+        </div>
       </div>
     </div>
   </q-page>
@@ -81,9 +91,19 @@ export default {
   methods: {
     handleBarcodeSubmit() {
       if (!this.showReceipt) {
-        this.fetchItem(this.barcode);
+        if (this.barcode === 'BETALA') {
+          this.checkout();
+        } else {
+          this.fetchItem(this.barcode);
+        }
       } else {
-        this.fetchCard(this.barcode);
+        if (this.barcode === 'NÄSTA') {
+          this.reset();
+        } else if (this.barcode === 'FÖRREGÅENDE') {
+          this.backToShopping();
+        } else {
+          this.fetchCard(this.barcode);
+        }
       }
       this.barcode = '';
       this.$nextTick(() => {
@@ -118,6 +138,12 @@ export default {
     },
     checkout() {
       this.showReceipt = true;
+      this.$refs.barcodeInput.focus();
+    },
+    backToShopping() {
+      this.barcode = '';
+      this.showReceipt = false;
+      this.paymentDone = false;
       this.$refs.barcodeInput.focus();
     },
     reset() {
